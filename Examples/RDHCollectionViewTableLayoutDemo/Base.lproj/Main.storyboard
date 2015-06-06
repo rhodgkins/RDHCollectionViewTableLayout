@@ -2,7 +2,6 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14D136" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="NuS-wj-wF2">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
-        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
         <!--Navigation Controller-->
@@ -33,13 +32,19 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" misplaced="YES" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="dar-Ae-3Yr">
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" misplaced="YES" alwaysBounceVertical="YES" alwaysBounceHorizontal="YES" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="dar-Ae-3Yr">
                                 <rect key="frame" x="45" y="96" width="600" height="600"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 <collectionViewLayout key="collectionViewLayout" id="htD-ji-Hjy" customClass="CollectionViewTableLayout" customModule="RDHCollectionViewTableLayoutDemo" customModuleProvider="target">
                                     <userDefinedRuntimeAttributes>
                                         <userDefinedRuntimeAttribute type="number" keyPath="columnHeaderHeight">
-                                            <real key="value" value="44"/>
+                                            <real key="value" value="50"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="number" keyPath="rowHeaderHeight">
+                                            <real key="value" value="10"/>
+                                        </userDefinedRuntimeAttribute>
+                                        <userDefinedRuntimeAttribute type="number" keyPath="rowFooterHeight">
+                                            <real key="value" value="12"/>
                                         </userDefinedRuntimeAttribute>
                                     </userDefinedRuntimeAttributes>
                                 </collectionViewLayout>
@@ -61,10 +66,10 @@
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </view>
                                         <constraints>
-                                            <constraint firstAttribute="trailingMargin" secondItem="YPK-wj-fXN" secondAttribute="trailing" id="2tz-K2-qC4"/>
-                                            <constraint firstItem="YPK-wj-fXN" firstAttribute="leading" secondItem="xGe-m8-CDq" secondAttribute="leadingMargin" id="EPx-4b-0S1"/>
-                                            <constraint firstItem="YPK-wj-fXN" firstAttribute="top" secondItem="xGe-m8-CDq" secondAttribute="topMargin" id="PI4-0M-uKM"/>
-                                            <constraint firstAttribute="bottomMargin" secondItem="YPK-wj-fXN" secondAttribute="bottom" id="zwf-M7-B3d"/>
+                                            <constraint firstAttribute="trailing" secondItem="YPK-wj-fXN" secondAttribute="trailing" id="2tz-K2-qC4"/>
+                                            <constraint firstItem="YPK-wj-fXN" firstAttribute="leading" secondItem="xGe-m8-CDq" secondAttribute="leading" id="EPx-4b-0S1"/>
+                                            <constraint firstItem="YPK-wj-fXN" firstAttribute="top" secondItem="xGe-m8-CDq" secondAttribute="top" id="PI4-0M-uKM"/>
+                                            <constraint firstAttribute="bottom" secondItem="YPK-wj-fXN" secondAttribute="bottom" id="zwf-M7-B3d"/>
                                         </constraints>
                                         <connections>
                                             <outlet property="textLabel" destination="YPK-wj-fXN" id="i40-V0-QiJ"/>

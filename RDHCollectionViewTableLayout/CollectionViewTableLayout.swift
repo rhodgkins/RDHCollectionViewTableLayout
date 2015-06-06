@@ -11,7 +11,6 @@ import UIKit
 @objc
 public protocol CollectionViewTableLayoutDataSource: UICollectionViewDataSource {
     
-    func numberOfTableRowsInCollectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout) -> Int
 }
 
 @objc
@@ -29,12 +28,25 @@ public protocol CollectionViewTableLayoutDelegate: UICollectionViewDelegate {
 @objc
 public class CollectionViewTableLayout: UICollectionViewLayout {
     
+//    /// Should examine the `tableColumn` property of the index path when dequeuing.
+//    @objc(elementKindColumnHeader)
+//    public static let ElementKindColumnHeader = "CollectionViewTableLayout.SupplementaryView.ColumnHeader"
+//    /// Should examine the `tableRow` property of the index path when dequeuing.
+//    @objc(elementKindRowHeader)
+//    public static let ElementKindRowHeader = "CollectionViewTableLayout.SupplementaryView.RowHeader"
+//    /// Should examine the `tableRow` property of the index path when dequeuing.
+//    @objc(elementKindRowFooter)
+//    public static let ElementKindRowFooter = "CollectionViewTableLayout.SupplementaryView.RowFooter"
+    
+    /// Should examine the `tableColumn` property of the index path when dequeuing.
     @objc(elementKindColumnHeader)
-    public static let ElementKindColumnHeader = "CollectionViewTableLayout.SupplementaryView.ColumnHeader"
+    public static let ElementKindColumnHeader = "ColumnHeader"
+    /// Should examine the `tableRow` property of the index path when dequeuing.
     @objc(elementKindRowHeader)
-    public static let ElementKindRowHeader = "CollectionViewTableLayout.SupplementaryView.RowHeader"
+    public static let ElementKindRowHeader = "   RowHeader"
+    /// Should examine the `tableRow` property of the index path when dequeuing.
     @objc(elementKindRowFooter)
-    public static let ElementKindRowFooter = "CollectionViewTableLayout.SupplementaryView.RowFooter"
+    public static let ElementKindRowFooter = "   RowFooter"
     
     @IBInspectable var frozenColumnHeaders: Bool = true {
         didSet { invalidateLayoutIfChanged(frozenColumnHeaders, fromOldValue: oldValue) }
@@ -51,6 +63,7 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
     @IBInspectable var rowFooterHeight: CGFloat = 0 {
         didSet { invalidateLayoutIfChanged(rowFooterHeight, fromOldValue: oldValue) }
     }
+    
     /// Key is the table column
     private var columnHeaderAttributes = [Int : UICollectionViewLayoutAttributes]()
     /// Key is the table row
@@ -67,7 +80,9 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
     private var rowFooterYOffsets = [Int : CGFloat]()
     /// Key is the table column, this contains numberOfColumns with the value for numberOfColumns being maxX of the last item
     private var columnXOffsets = [Int : CGFloat]()
+    /// Cached
     private var numberOfRows = 0
+    /// Cached
     private var numberOfColumns = 0
     
     public override init() {
@@ -97,6 +112,10 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
         columnXOffsets.removeAll()
     }
     
+    public override func shouldInvalidateLayoutForBoundsChange(newBounds: CGRect) -> Bool {
+        return collectionView?.bounds.size != newBounds.size
+    }
+    
     public override func prepareLayout() {
         super.prepareLayout()
         
@@ -112,10 +131,24 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
                 }
             }
             
-            numberOfRows = dataSource.numberOfTableRowsInCollectionView(collectionView, layout:self)
+            numberOfRows = dataSource.numberOfSectionsInCollectionView?(collectionView) ?? 0
             numberOfColumns = dataSource.collectionView(collectionView, numberOfItemsInSection: 0)
             
+            // Visible collection view
+            var visibleRect = collectionView.bounds
+            visibleRect.origin = collectionView.contentOffset
+            
+            // Get current row range
+            var visibleRowLowerBounds: Int?
+            var visibleRowUpperBounds: Int?
+            
             var y: CGFloat = columnHeaderHeight
+            
+            // Set initial values in case there are no rows
+            rowHeaderYOffsets[numberOfRows] = y
+            rowYOffsets[numberOfRows] = y
+            rowFooterYOffsets[numberOfRows] = y
+            
             for row in 0..<numberOfRows {
                 let headerHeight = delegate.collectionView?(collectionView, layout: self, rowHeaderHeightForTableRow: row) ?? rowHeaderHeight
                 rowHeaderAttributes[row] = updateRowSupplementaryAttributes(newLayoutAttributesForSupplementaryRowHeaderView(row), withYOffset: y, height: headerHeight)
@@ -124,8 +157,21 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
                 // Keep storing the last one
                 rowHeaderYOffsets[numberOfRows] = y
                 
+                let height = delegate.collectionView?(collectionView, layout: self, rowHeightForTableRow: row) ?? rowHeight
+                let intersects = visibleRect.intersects(CGRect(x: 0, y: y, width: 0, height: height))
+                if intersects {
+                    if visibleRowLowerBounds == nil {
+                        visibleRowLowerBounds = row
+                        visibleRowUpperBounds = row + 1
+                    }
+                    
+                    if intersects {
+                        visibleRowUpperBounds = row
+                    }
+                }
+                
                 rowYOffsets[row] = y
-                y += delegate.collectionView?(collectionView, layout: self, rowHeightForTableRow: row) ?? rowHeight
+                y += height
                 // Keep storing the last one
                 rowYOffsets[numberOfRows] = y
                 
@@ -137,9 +183,46 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
                 rowFooterYOffsets[numberOfRows] = y
             }
             
+            func addColumnHeader(column: Int, x: CGFloat, width: CGFloat) {
+                if columnHeaderHeight > 0 {
+                    let attrs = newLayoutAttributesForSupplementaryColumnHeaderView(column)
+                    attrs.frame = CGRect(x: x, y: 0, width: width, height: columnHeaderHeight)
+                    columnHeaderAttributes[column] = attrs
+                }
+            }
+            
+            /// :returns: `true` if x is in the visible range of the collection view
+            func isXInCollectionViewBounds(x: CGFloat) -> Bool {
+                return visibleRect.contains(CGPoint(x: x, y: visibleRect.midY))
+            }
+            
+            let rowRange: Range<Int>?
+            if let lower = visibleRowLowerBounds, upper = visibleRowUpperBounds {
+                rowRange = lower..<upper
+            } else {
+                rowRange = nil
+            }
+            
             var x: CGFloat = 0
             for column in 0..<numberOfColumns {
                 let width = delegate.collectionView(collectionView, layout: self, columnWidthForTableColumn: column)
+                
+                // Add column header attribute
+                addColumnHeader(column, x, width)
+                
+                if let rowRange = rowRange where isXInCollectionViewBounds(x) {
+                    // Pre calculate these items
+                    for row in rowRange {
+                        if let minY = rowYOffsets[row], maxY = rowFooterYOffsets[row] {
+                            let indexPath = NSIndexPath(forTableColumn: column, inTableRow: row)
+                            let attrs = newLayoutAttributesForItem(indexPath)
+                            attrs.frame = CGRect(x: x, y: minY, width: width, height: maxY - minY)
+                            itemAttributes[indexPath] = attrs
+                        }
+                    }
+                }
+                
+                // Store and update
                 columnXOffsets[column] = x
                 x += width
             }
@@ -161,111 +244,108 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
     public override func layoutAttributesForElementsInRect(rect: CGRect) -> [AnyObject]? {
         var attributes = [UICollectionViewLayoutAttributes]()
         
+        if numberOfColumns == 0 {
+            // Break early as we'll have nothing to show
+            return attributes
+        }
+        
         func addAttributeIfNeeded(attr: UICollectionViewLayoutAttributes) {
             if rect.intersects(attr.frame) {
                 attributes.append(attr)
             }
         }
         
-        func visibleColumnRange() -> Range<Int>? {
-        
-            var lowerColumnBound: Int? = nil
-            var upperColumBound: Int? = nil
-            for col in 0...numberOfColumns {
-                if let x = columnXOffsets[col] {
-                    if x > rect.maxX {
-                        // Beyond the rect
-                        break
-                    }
-                
-                    if x >= rect.minX {
-                        if lowerColumnBound == nil {
-                            lowerColumnBound = col
+        func visibleRange(min: CGFloat, max: CGFloat, offsetCount: Int, @noescape offsetsCalculator: (item: Int) -> (min: CGFloat?, max: CGFloat?)) -> Range<Int>? {
+       
+            var lowerBound: Int? = nil
+            var upperBound: Int? = nil
+            
+            let rect = CGRect(x: min, y: 0, width: max - min, height: 0)
+            
+            for idx in 0...offsetCount {
+                let itemRange = offsetsCalculator(item: idx)
+                let itemMax = itemRange.max ?? itemRange.min
+                if let itemMin = itemRange.min, itemMax = itemMax {
+                    let itemRect = CGRect(x: itemMin, y: 0, width: itemMax - itemMin, height: 0)
+                    
+                    let intersects = rect.intersects(itemRect)
+                    
+                    if intersects {
+                        if lowerBound == nil {
+                            lowerBound = idx
                         }
                     }
-                
-                    if lowerColumnBound != nil {
-                        upperColumBound = col
+                    
+                    if lowerBound != nil {
+                        upperBound = idx
+                        
+                        if !intersects {
+                            // We're done intersecting
+                            break
+                        }
                     }
                 }
             }
             
-            if let lowerColumnBound = lowerColumnBound, upperColumBound = upperColumBound {
-                return lowerColumnBound..<upperColumBound
+            if let lowerBound = lowerBound, upperBound = upperBound {
+                return lowerBound..<upperBound
             } else {
                 return nil
             }
         }
         
-        func visibleRowRange() -> Range<Int>? {
-            
-            var lowerRowBound: Int? = nil
-            var upperRowBound: Int? = nil
-            var y: CGFloat = 0
-            for row in 0...numberOfRows {
-                if let minY = rowHeaderYOffsets[row], maxY = rowFooterYOffsets[row] {
-                    if maxY > rect.maxY {
-                        // Beyond the rect
-                        break
-                    }
-                    
-                    if minY >= rect.minY {
-                        if lowerRowBound == nil {
-                            lowerRowBound = row
-                        }
-                    }
-                    
-                    if lowerRowBound != nil {
-                        upperRowBound = row
-                    }
-                }
-            }
-            
-            if let lowerRowBound = lowerRowBound, upperRowBound = upperRowBound {
-                return lowerRowBound..<upperRowBound
-            } else {
-                return nil
-            }
+        let visibleRows = visibleRange(rect.minY, rect.maxY, numberOfRows) { (item) in// -> (CGFloat?, CGFloat?) in
+            return (rowHeaderYOffsets[item], rowFooterYOffsets[item])
         }
-
-        if let visibleColumns = visibleColumnRange() {
+        let visibleColumns = visibleRange(rect.minX, rect.maxX, numberOfColumns) { (item) -> (CGFloat?, CGFloat?) in
+            return (columnXOffsets[item], columnXOffsets[item + 1])
+        }
         
+        // Add items for all visible rows
+        if let collectionView = collectionView, visibleRows = visibleRows, visibleColumns = visibleColumns {
+            
+            println("Currently visible rows: \(visibleRows)")
+            println("Currently visible columns: \(visibleColumns)")
+            
             // Add column headers if the rect maxY is less than the header height or its frozen
-            if frozenColumnHeaders || (rect.maxY <= columnHeaderHeight) {
-                
-                for col in visibleColumns {
-                    if let attr = columnHeaderAttributes[col] {
-                        addAttributeIfNeeded(attr)
-                    }
+            let columnsHeadersNeedAdding = frozenColumnHeaders || (rect.maxY <= columnHeaderHeight)
+            
+            for col in visibleColumns {
+                if let attr = columnHeaderAttributes[col] {
+                    addAttributeIfNeeded(attr)
                 }
             }
-        
-            if let visibleRows = visibleRowRange() {
-                for row in visibleRows {
-                    
-                    for col in visibleColumns {
-                        let indexPath = NSIndexPath(forTableColumn: col, inTableRow: row)
-                        if let attr = itemAttributes[indexPath] {
-                            addAttributeIfNeeded(attr)
-                        }
-                    }
+            
+            for row in visibleRows {
+                
+                // Headers
+                if let attr = rowHeaderAttributes[row] {
+                    addAttributeIfNeeded(attr)
+                }
+                
+                // Add column items
+                for col in visibleColumns {
+                    // Cells
+                    let indexPath = NSIndexPath(forTableColumn: col, inTableRow: row)
+                    addAttributeIfNeeded(loadLayoutAttributesForItem(indexPath))
+                }
+                
+                // Footers
+                if let attr = rowFooterAttributes[row] {
+                    addAttributeIfNeeded(attr)
                 }
             }
         }
+        
+        println("Rect: \(rect)")
+        println("Items: {\n" + join("", map(attributes) { "\t[(\($0.indexPath.tableRow),\($0.indexPath.tableColumn)) - \($0.representedElementKind) : \($0.frame)]\n" }) + "}")
         
         return attributes
     }
     
     public override func layoutAttributesForItemAtIndexPath(indexPath: NSIndexPath) -> UICollectionViewLayoutAttributes! {
         
-        if let attribute = itemAttributes[indexPath] {
-            return attribute
-        } else {
-            let attribute = newLayoutAttributesForItem(indexPath)
-            // TODO: Calculate frame
-            itemAttributes[indexPath] = attribute
-            return attribute
-        }
+        return loadLayoutAttributesForItem(indexPath)
     }
     
     public override func layoutAttributesForSupplementaryViewOfKind(elementKind: String, atIndexPath indexPath: NSIndexPath) -> UICollectionViewLayoutAttributes! {
@@ -287,7 +367,8 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
         }
         
         let info = resolveInfo()
-        return info.lookup[info.key]
+        let attrs = info.lookup[info.key]
+        return attrs
     }
 }
 
@@ -308,6 +389,25 @@ private struct SupplementaryViewIndexes {
 }
 
 private extension CollectionViewTableLayout {
+    
+    func loadLayoutAttributesForItem(indexPath: NSIndexPath) -> UICollectionViewLayoutAttributes {
+       
+        if let attribute = itemAttributes[indexPath] {
+            return attribute
+        } else {
+            let attribute = newLayoutAttributesForItem(indexPath)
+            
+            let column = indexPath.tableColumn
+            let row = indexPath.tableRow
+            // Bottom of cell is top of its footer
+            if let minX = columnXOffsets[column], maxX = columnXOffsets[column + 1], minY = rowYOffsets[row], maxY = rowFooterYOffsets[row] {
+                attribute.frame = CGRect(x: minX, y: minY, width: maxX - minX, height: maxY - minY)
+            }
+            
+            itemAttributes[indexPath] = attribute
+            return attribute
+        }
+    }
     
     /// Sets no position or size information
     func newLayoutAttributesForItem(indexPath: NSIndexPath) -> UICollectionViewLayoutAttributes {
@@ -342,7 +442,7 @@ private extension CollectionViewTableLayout {
     /// Sets no position or size information
     func newLayoutAttributesForSupplementaryRowFooterView(row: Int) -> UICollectionViewLayoutAttributes {
         
-        let attribute = newLayoutAttributesForSupplementaryViewOfKind(self.dynamicType.ElementKindRowHeader, atIndexPath: NSIndexPath(forTableColumn: SupplementaryViewIndexes.RowFooter, inTableRow: row))
+        let attribute = newLayoutAttributesForSupplementaryViewOfKind(self.dynamicType.ElementKindRowFooter, atIndexPath: NSIndexPath(forTableColumn: SupplementaryViewIndexes.RowFooter, inTableRow: row))
         
         attribute.zIndex = AttributeZIndex.RowFooters.rawValue
         
