@@ -1,0 +1,4 @@
+language: objective-c
+xcode_project: Examples/RDHCollectionViewTableLayoutDemo.xcodeproj
+xcode_scheme: RDHCollectionViewTableLayoutDemo
+xcode_sdk: iphonesimulator
