@@ -1,25 +1,99 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6211" systemVersion="14A298i" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14D136" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="NuS-wj-wF2">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6204"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
-        <scene sceneID="tne-QT-ifu">
+        <!--Navigation Controller-->
+        <scene sceneID="51R-OP-FQi">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModuleProvider="target" sceneMemberID="viewController">
+                <navigationController id="NuS-wj-wF2" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="TRJ-TX-NpF">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="qok-Kh-wai" kind="relationship" relationship="rootViewController" id="2ln-XF-5Xv"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="bhU-RK-nr0" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-364" y="15"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="6dN-0i-VwZ">
+            <objects>
+                <viewController id="qok-Kh-wai" customClass="ViewController" customModule="RDHCollectionViewTableLayoutDemo" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
-                        <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
+                        <viewControllerLayoutGuide type="top" id="Y1k-9D-zYy"/>
+                        <viewControllerLayoutGuide type="bottom" id="JGx-9h-Wuq"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                    <view key="view" contentMode="scaleToFill" id="krR-Zq-Hyt">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <subviews>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" misplaced="YES" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="dar-Ae-3Yr">
+                                <rect key="frame" x="45" y="96" width="600" height="600"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <collectionViewLayout key="collectionViewLayout" id="htD-ji-Hjy" customClass="CollectionViewTableLayout" customModule="RDHCollectionViewTableLayoutDemo" customModuleProvider="target">
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="number" keyPath="columnHeaderHeight">
+                                            <real key="value" value="44"/>
+                                        </userDefinedRuntimeAttribute>
+                                    </userDefinedRuntimeAttributes>
+                                </collectionViewLayout>
+                                <cells>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="CellIdentifier" id="xGe-m8-CDq" customClass="Cell" customModule="RDHCollectionViewTableLayoutDemo" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YPK-wj-fXN">
+                                                    <rect key="frame" x="4" y="15" width="42" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </view>
+                                        <constraints>
+                                            <constraint firstAttribute="trailingMargin" secondItem="YPK-wj-fXN" secondAttribute="trailing" id="2tz-K2-qC4"/>
+                                            <constraint firstItem="YPK-wj-fXN" firstAttribute="leading" secondItem="xGe-m8-CDq" secondAttribute="leadingMargin" id="EPx-4b-0S1"/>
+                                            <constraint firstItem="YPK-wj-fXN" firstAttribute="top" secondItem="xGe-m8-CDq" secondAttribute="topMargin" id="PI4-0M-uKM"/>
+                                            <constraint firstAttribute="bottomMargin" secondItem="YPK-wj-fXN" secondAttribute="bottom" id="zwf-M7-B3d"/>
+                                        </constraints>
+                                        <connections>
+                                            <outlet property="textLabel" destination="YPK-wj-fXN" id="i40-V0-QiJ"/>
+                                        </connections>
+                                    </collectionViewCell>
+                                </cells>
+                                <connections>
+                                    <outlet property="dataSource" destination="qok-Kh-wai" id="MDH-dm-8pB"/>
+                                    <outlet property="delegate" destination="qok-Kh-wai" id="mKl-Um-1ur"/>
+                                </connections>
+                            </collectionView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="dar-Ae-3Yr" firstAttribute="leading" secondItem="krR-Zq-Hyt" secondAttribute="leading" id="4vm-YV-hwq"/>
+                            <constraint firstItem="dar-Ae-3Yr" firstAttribute="top" secondItem="krR-Zq-Hyt" secondAttribute="top" id="5fE-Cm-YZV"/>
+                            <constraint firstAttribute="bottom" secondItem="dar-Ae-3Yr" secondAttribute="bottom" id="Rcz-Wx-vcK"/>
+                            <constraint firstAttribute="trailing" secondItem="dar-Ae-3Yr" secondAttribute="trailing" id="tcS-ca-QpL"/>
+                        </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="gNd-zp-fiv"/>
+                    <connections>
+                        <outlet property="collectionView" destination="dar-Ae-3Yr" id="jND-Kf-6Zs"/>
+                        <outlet property="layout" destination="htD-ji-Hjy" id="07k-YB-bCo"/>
+                    </connections>
                 </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="VNC-kP-3dl" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="434" y="15"/>
         </scene>
     </scenes>
 </document>

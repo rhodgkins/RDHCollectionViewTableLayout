@@ -71,8 +71,8 @@
 				44F2886A1B23088D00DD37A3 /* README.md */,
 				44F2886D1B23092600DD37A3 /* images */,
 				44F288671B23088200DD37A3 /* RDHCollectionViewTableLayout */,
-				44F288441B2307FD00DD37A3 /* Tests */,
-				44F2885A1B2307FD00DD37A3 /* RDHCollectionViewTableLayoutDemoTests */,
+				44F288441B2307FD00DD37A3 /* Demo */,
+				44F2885A1B2307FD00DD37A3 /* Tests */,
 				44F288431B2307FD00DD37A3 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -86,7 +86,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		44F288441B2307FD00DD37A3 /* Tests */ = {
+		44F288441B2307FD00DD37A3 /* Demo */ = {
 			isa = PBXGroup;
 			children = (
 				44F288471B2307FD00DD37A3 /* AppDelegate.swift */,
@@ -96,7 +96,7 @@
 				44F288501B2307FD00DD37A3 /* LaunchScreen.xib */,
 				44F288451B2307FD00DD37A3 /* Supporting Files */,
 			);
-			name = Tests;
+			name = Demo;
 			path = RDHCollectionViewTableLayoutDemo;
 			sourceTree = "<group>";
 		};
@@ -108,13 +108,12 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		44F2885A1B2307FD00DD37A3 /* RDHCollectionViewTableLayoutDemoTests */ = {
+		44F2885A1B2307FD00DD37A3 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 				44F2885D1B2307FD00DD37A3 /* RDHTableLayoutTests.swift */,
 				44F2885B1B2307FD00DD37A3 /* Supporting Files */,
 			);
-			name = RDHCollectionViewTableLayoutDemoTests;
 			path = Tests;
 			sourceTree = "<group>";
 		};
@@ -374,9 +373,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = RDHCollectionViewTableLayoutDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
@@ -384,6 +385,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = RDHCollectionViewTableLayoutDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
