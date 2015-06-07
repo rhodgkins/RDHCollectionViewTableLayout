@@ -16,6 +16,8 @@ final class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        collectionView.contentInset = UIEdgeInsets(top: 100, left: 80, bottom: 60, right: 70)
+        
         layout.firstFrozenTableColumns = 1
         
         collectionView.registerClass(ColumnHeader.self, forSupplementaryViewOfKind: CollectionViewTableLayout.ElementKindColumnHeader, withReuseIdentifier: ColumnHeaderIdentifier)

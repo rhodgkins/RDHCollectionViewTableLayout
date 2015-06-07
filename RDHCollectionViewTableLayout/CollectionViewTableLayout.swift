@@ -108,6 +108,7 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
     private var everythingNeedsUpdate = true
     private var columnHeaderYNeedsUpdate = true
     private var rowSupplementaryViewXNeedsUpdate = true
+    private var frozenColumnsNeedsUpdate = true
     
     public override class func invalidationContextClass() -> AnyClass {
         return TableLayoutInvaldationContext.self
@@ -131,15 +132,20 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
     public override func invalidateLayoutWithContext(context: UICollectionViewLayoutInvalidationContext) {
         super.invalidateLayoutWithContext(context)
         
+        let context = context as! TableLayoutInvaldationContext
+        
+        if context.invalidateContent {
+            everythingNeedsUpdate = true
+        }
+        
         if everythingNeedsUpdate {
-            // Nothing to do
+            // Nothing to more to do
             return
         }
         
-        let context = context as! TableLayoutInvaldationContext
-        
         columnHeaderYNeedsUpdate = context.invalidateColumnHeaderFreezeState
         rowSupplementaryViewXNeedsUpdate = context.invalidateRowSupplementaryViews
+        frozenColumnsNeedsUpdate = context.invalidateFrozenColumns
         
         if context.invalidateEverything || context.invalidateDataSourceCounts {
             everythingNeedsUpdate = true
@@ -153,53 +159,52 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
                 }
             }
         }
-        
-        if context.invalidateFrozenColumns {
-            everythingNeedsUpdate = true
-        }
-        
-        println("Everything: \(context.invalidateEverything)")
-        println("Row header/footer: \(context.invalidateRowSupplementaryViews)")
-        println("Colunn freezing: \(context.invalidateColumnHeaderFreezeState)")
     }
     
     public override func invalidationContextForBoundsChange(newBounds: CGRect) -> UICollectionViewLayoutInvalidationContext {
         
         let context = super.invalidationContextForBoundsChange(newBounds) as! TableLayoutInvaldationContext
 
-        if newBounds.origin.x != collectionView?.bounds.origin.x {
-            // Need to update any headers and footers as these are full width
-            context.invalidateRowSupplementaryViews = true
+        println(newBounds.size != collectionView?.bounds.size)
+        if newBounds.size != collectionView?.bounds.size {
+            // Calculate everything again
+            context.invalidateContent = true
+        } else {
             
-            if firstFrozenTableColumns > 0 {
-                context.invalidateFrozenColumns = true
+            if newBounds.origin.x != collectionView?.bounds.origin.x {
+                // Need to update any headers and footers as these are full width
+                context.invalidateRowSupplementaryViews = true
+                
+                if firstFrozenTableColumns > 0 {
+                    context.invalidateFrozenColumns = true
+                }
             }
-        }
+            
+            if frozenColumnHeaders {
+                if newBounds.origin.y != collectionView?.bounds.origin.y {
+                    // Need to move the column headers if we're frozen
+                    context.invalidateColumnHeaderFreezeState = true
+                }
+            }
         
-        if frozenColumnHeaders {
-            if newBounds.origin.y != collectionView?.bounds.origin.y {
-                // Need to move the column headers if we're frozen
-                context.invalidateColumnHeaderFreezeState = true
-            }
-        }
-        
-//        println(newBounds)
-//        println(UIEdgeInsetsInsetRect(newBounds, collectionView!.contentInset))
-        if let collectionView = collectionView {
-            
-            let newInsetBounds = UIEdgeInsetsInsetRect(newBounds, collectionView.contentInset)
-            
-            // Check if we need to update the Y position of the column headers to keep them pinned to the top when scroll view is pull down too far
-            if newInsetBounds.minY < 0 {
-                context.invalidateColumnHeaderFreezeState = true
-            }
+//            println(newBounds)
+//            println(UIEdgeInsetsInsetRect(newBounds, collectionView!.contentInset))
+            if let collectionView = collectionView {
+                
+                let newInsetBounds = UIEdgeInsetsInsetRect(newBounds, collectionView.contentInset)
+                
+                // Check if we need to update the Y position of the column headers to keep them pinned to the top when scroll view is pull down too far
+                if newInsetBounds.minY < 0 {
+                    context.invalidateColumnHeaderFreezeState = true
+                }
 
-            // Check if we need to update the X position of the row headers to keep them pinned to the left or right when scrolling too far
-            if newInsetBounds.minX < 0 {
-                context.invalidateRowSupplementaryViews = true
-            }
-            if newInsetBounds.maxX > collectionView.contentSize.width {
-                context.invalidateRowSupplementaryViews = true
+                // Check if we need to update the X position of the row headers to keep them pinned to the left or right when scrolling too far
+                if newInsetBounds.minX < 0 {
+                    context.invalidateRowSupplementaryViews = true
+                }
+                if newInsetBounds.maxX > collectionView.contentSize.width {
+                    context.invalidateRowSupplementaryViews = true
+                }
             }
         }
         
@@ -208,6 +213,7 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
     
     public override func shouldInvalidateLayoutForBoundsChange(newBounds: CGRect) -> Bool {
         // Only invalidate if the bounds change
+        println("\(newBounds.size) != \(collectionView?.bounds.size)")
         return collectionView?.bounds != newBounds
     }
     
@@ -217,7 +223,8 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
         println("Everything updates: \(everythingNeedsUpdate)")
         println("Row header/footer updates: \(rowSupplementaryViewXNeedsUpdate)")
         println("Colunn updates: \(columnHeaderYNeedsUpdate)")
-
+        println("Frozen column update: \(frozenColumnsNeedsUpdate)")
+        
         if self.collectionView == nil {
             // Nothing to do
             return
@@ -240,15 +247,9 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
         
         let rowSupplementaryViewX = bounds.minX
         
-        let columnHeaderX = collectionView.contentInset.left
+        let columnHeaderX: CGFloat = 0
         let columnHeaderY = calculateColumnHeaderY()
         
-//        println("Y:                     \(bounds.minY)")
-//        println("columnHeaderY:         \(columnHeaderY)")
-//        println("minX:                  \(bounds.minX)")
-//        println("maxX:                  \(bounds.maxX)")
-//        println("rowSupplementaryViewX: \(rowSupplementaryViewX)")
-//        println("columnHeaderX:         \(columnHeaderX)")
         if everythingNeedsUpdate {
 
             /// :returns: the updated attributes if the height is greater than 0, `nil` otherwise
@@ -349,9 +350,6 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
                 /// Only adds attributes if `columnHeaderHeight` is greater than 0.
                 func addColumnHeader(column: Int, var x: CGFloat, width: CGFloat) {
                     if columnHeaderHeight > 0 {
-                        if column < firstFrozenTableColumns {
-                            x += bounds.minX > 0 ? bounds.minX : 0
-                        }
                         let attrs = newLayoutAttributesForSupplementaryColumnHeaderView(column)
                         attrs.frame = CGRect(x: x, y: columnHeaderY, width: width, height: columnHeaderHeight)
                         columnHeaderAttributes[column] = attrs
@@ -377,14 +375,9 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
                     if let rowRange = rowRange where isXInCollectionViewBounds(x) {
                         // Pre calculate these items as they're going to be visible
                         for row in rowRange {
-                            if let minY = rowYOffsets[row], maxY = rowFooterYOffsets[row] {
-                                var colX = x
-                                if column < firstFrozenTableColumns {
-                                    colX += bounds.minX > 0 ? bounds.minX : 0
-                                }
-                                let indexPath = NSIndexPath(forTableColumn: column, inTableRow: row)
+                            if let minY = rowYOffsets[row], maxY = rowFooterYOffsets[row] {                                let indexPath = NSIndexPath(forTableColumn: column, inTableRow: row)
                                 let attrs = newLayoutAttributesForItem(indexPath)
-                                attrs.frame = CGRect(x: colX, y: minY, width: width, height: maxY - minY)
+                                attrs.frame = CGRect(x: x, y: minY, width: width, height: maxY - minY)
                                 itemAttributes[indexPath] = attrs
                             }
                         }
@@ -400,6 +393,7 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
             // These have already been calculated
             rowSupplementaryViewXNeedsUpdate = false
             columnHeaderYNeedsUpdate = false
+//            frozenColumnsNeedsUpdate = false
         }
         
         if rowSupplementaryViewXNeedsUpdate {
@@ -418,13 +412,29 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
         if columnHeaderYNeedsUpdate {
             for column in 0..<numberOfColumns {
                 let attr = columnHeaderAttributes[column]
-                if var x = columnXOffsets[column] {
-                    if column < firstFrozenTableColumns {
-                        x += bounds.minX > 0 ? bounds.minX : 0
-                    }
-                    attr?.frame.origin.x = x
-                }
                 attr?.frame.origin.y = columnHeaderY
+            }
+        }
+        
+        if frozenColumnsNeedsUpdate {
+            
+            func updateAttributesPosition(var xOffset: CGFloat, attrs: UICollectionViewLayoutAttributes?) {
+                if bounds.minX > 0 {
+                    xOffset += bounds.minX
+                }
+                attrs?.frame.origin.x = xOffset
+            }
+            
+            for column in 0..<firstFrozenTableColumns {
+                
+                if let x = columnXOffsets[column] {
+                    updateAttributesPosition(x, columnHeaderAttributes[column])
+                
+                    for row in 0..<numberOfRows {
+                        let indexPath = NSIndexPath(forTableColumn: column, inTableRow: row)
+                        updateAttributesPosition(x, itemAttributes[indexPath])
+                    }
+                }
             }
         }
         
@@ -432,6 +442,7 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
         everythingNeedsUpdate = false
         rowSupplementaryViewXNeedsUpdate = false
         columnHeaderYNeedsUpdate = false
+        frozenColumnsNeedsUpdate = false
     }
     
     public override func collectionViewContentSize() -> CGSize {
@@ -610,7 +621,9 @@ private extension CollectionViewTableLayout {
             if var minX = columnXOffsets[column], maxX = columnXOffsets[column + 1], minY = rowYOffsets[row], maxY = rowFooterYOffsets[row] {
                 let width = maxX - minX
                 if column < firstFrozenTableColumns {
-                    minX += collectionView!.bounds.minX
+                    if let collectionView = collectionView where (collectionView.bounds.minX + collectionView.contentInset.left) > 0 {
+                        minX += collectionView.bounds.minX
+                    }
                 }
                 attribute.frame = CGRect(x: minX, y: minY, width: width, height: maxY - minY)
             }
@@ -697,6 +710,7 @@ private extension CollectionViewTableLayout {
 
 class TableLayoutInvaldationContext: UICollectionViewLayoutInvalidationContext {
     
+    var invalidateContent = false
     var invalidateColumnHeaderFreezeState = false
     var invalidateFrozenColumns = false
     var invalidateRowSupplementaryViews = false
