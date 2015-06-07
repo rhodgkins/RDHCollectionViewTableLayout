@@ -92,6 +92,12 @@ class Cell: UICollectionViewCell {
     
     @IBOutlet private weak var textLabel: UILabel!
     
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        
+        layer.borderWidth = 1
+        layer.borderColor = UIColor.greenColor().CGColor
+    }
 }
 
 // MARK: - Column header
@@ -103,6 +109,8 @@ class ColumnHeader: UICollectionReusableView {
     override func willMoveToWindow(newWindow: UIWindow?) {
         super.willMoveToWindow(newWindow)
         
+        layer.borderWidth = 1
+        layer.borderColor = UIColor.darkGrayColor().CGColor
         backgroundColor = UIColor.redColor()
         
         if label.superview == nil {
@@ -120,6 +128,8 @@ class RowHeader: UICollectionReusableView {
     override func willMoveToWindow(newWindow: UIWindow?) {
         super.willMoveToWindow(newWindow)
         
+        layer.borderWidth = 1
+        layer.borderColor = UIColor.orangeColor().CGColor
         backgroundColor = UIColor.blueColor()
     }
 }
@@ -131,6 +141,8 @@ class RowFooter: UICollectionReusableView {
     override func willMoveToWindow(newWindow: UIWindow?) {
         super.willMoveToWindow(newWindow)
         
+        layer.borderWidth = 1
+        layer.borderColor = UIColor.purpleColor().CGColor
         backgroundColor = UIColor.yellowColor()
     }
 }
