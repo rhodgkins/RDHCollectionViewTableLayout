@@ -31,26 +31,17 @@ public protocol CollectionViewTableLayoutDelegate: UICollectionViewDelegate {
 @objc
 public class CollectionViewTableLayout: UICollectionViewLayout {
     
-//    /// Should examine the `tableColumn` property of the index path when dequeuing.
-//    @objc(elementKindColumnHeader)
-//    public static let ElementKindColumnHeader = "CollectionViewTableLayout.SupplementaryView.ColumnHeader"
-//    /// Should examine the `tableRow` property of the index path when dequeuing.
-//    @objc(elementKindRowHeader)
-//    public static let ElementKindRowHeader = "CollectionViewTableLayout.SupplementaryView.RowHeader"
-//    /// Should examine the `tableRow` property of the index path when dequeuing.
-//    @objc(elementKindRowFooter)
-//    public static let ElementKindRowFooter = "CollectionViewTableLayout.SupplementaryView.RowFooter"
-    
     /// Should examine the `tableColumn` property of the index path when dequeuing.
     @objc(elementKindColumnHeader)
-    public static let ElementKindColumnHeader = "ColumnHeader"
+    public static let ElementKindColumnHeader = "CollectionViewTableLayout.SupplementaryView.ColumnHeader"
     /// Should examine the `tableRow` property of the index path when dequeuing.
     @objc(elementKindRowHeader)
-    public static let ElementKindRowHeader = "   RowHeader"
+    public static let ElementKindRowHeader = "CollectionViewTableLayout.SupplementaryView.RowHeader"
     /// Should examine the `tableRow` property of the index path when dequeuing.
     @objc(elementKindRowFooter)
-    public static let ElementKindRowFooter = "   RowFooter"
+    public static let ElementKindRowFooter = "CollectionViewTableLayout.SupplementaryView.RowFooter"
     
+    /// Set to `true` to always show the column headers above the rows.
     @IBInspectable public var frozenColumnHeaders: Bool = true {
         didSet {
             invalidateLayoutIfChanged(frozenColumnHeaders, fromOldValue: oldValue) {
@@ -70,15 +61,33 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
             }
         }
     }
+    /// Column header height, dequeue views with `ElementKindColumnHeader`
     @IBInspectable public var columnHeaderHeight: CGFloat = 36 {
         didSet { invalidateLayoutIfChanged(columnHeaderHeight, fromOldValue: oldValue) }
     }
+    /// Constant row height. This can be set per row using `collectionView:layout:rowHeightForTableRow:` in `CollectionViewTableLayoutDelegate`.
     @IBInspectable public var rowHeight: CGFloat = 36 {
         didSet { invalidateLayoutIfChanged(rowHeight, fromOldValue: oldValue) }
     }
+    /**
+     * Constant row header height. This can be set per row using `collectionView:layout:rowHeaderHeightForTableRow:` in `CollectionViewTableLayoutDelegate`.
+     * Setting this to 0 will mean the header is not used.
+     * 
+     * Headers are drawn above the row and given the full inset width of the collection view.
+     * 
+     * Defaults to 0 so headers are not shown.
+     */
     @IBInspectable public var rowHeaderHeight: CGFloat = 0 {
         didSet { invalidateLayoutIfChanged(rowHeaderHeight, fromOldValue: oldValue) }
     }
+    /**
+     * Constant row footer height. This can be set per row using `collectionView:layout:rowFooterHeightForTableRow:` in `CollectionViewTableLayoutDelegate`.
+     * Setting this to 0 will mean the footer is not used.
+     *
+     * Footers are drawn below the row and given the full inset width of the collection view.
+     *
+     * Defaults to 0 so footers are not shown.
+     */
     @IBInspectable public var rowFooterHeight: CGFloat = 0 {
         didSet { invalidateLayoutIfChanged(rowFooterHeight, fromOldValue: oldValue) }
     }
