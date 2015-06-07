@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name = 'RDHCollectionViewTableLayout'
-    s.version = '1.2.1'
+    s.version = '1.0.0'
     s.license = 'MIT'
     
     s.summary = 'Table layout for UICollectionView.'
@@ -13,6 +13,6 @@ Pod::Spec.new do |s|
     s.frameworks = 'Foundation', 'UIKit', 'CoreGraphics'
     s.requires_arc = true
     
-    s.ios.deployment_target = '6.0'
+    s.ios.deployment_target = '8.0'
     s.source_files = 'RDHCollectionViewTableLayout/'
 end
