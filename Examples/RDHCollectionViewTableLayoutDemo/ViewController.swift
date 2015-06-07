@@ -16,7 +16,7 @@ final class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        collectionView.contentInset = UIEdgeInsets(top: 100, left: 80, bottom: 60, right: 70)
+//        collectionView.contentInset = UIEdgeInsets(top: 100, left: 80, bottom: 60, right: 70)
         
         layout.firstFrozenTableColumns = 1
 //        layout.columnHeaderHeight = 0

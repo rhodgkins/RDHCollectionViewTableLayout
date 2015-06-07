@@ -23,7 +23,7 @@
         <!--View Controller-->
         <scene sceneID="6dN-0i-VwZ">
             <objects>
-                <viewController automaticallyAdjustsScrollViewInsets="NO" id="qok-Kh-wai" customClass="ViewController" customModule="RDHCollectionViewTableLayoutDemo" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="qok-Kh-wai" customClass="ViewController" customModule="RDHCollectionViewTableLayoutDemo" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="Y1k-9D-zYy"/>
                         <viewControllerLayoutGuide type="bottom" id="JGx-9h-Wuq"/>
