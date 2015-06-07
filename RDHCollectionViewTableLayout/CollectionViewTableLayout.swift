@@ -18,10 +18,13 @@ public protocol CollectionViewTableLayoutDelegate: UICollectionViewDelegate {
     
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, columnWidthForTableColumn: Int) -> CGFloat
     
+    /// If implemented a greater than 0 return value will take precidece over the layouts `rowHeight` property.
     optional func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, rowHeightForTableRow: Int) -> CGFloat
     
+    /// If implemented the return value will take precidece over the layouts `rowHeaderHeight` property. Return a greater than 0 value to include a header for this table row.
     optional func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, rowHeaderHeightForTableRow: Int) -> CGFloat
     
+    /// If implemented the return value will take precidece over the layouts `rowFooterHeight` property. Return a greater than 0 value to include a footer for this table row.
     optional func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, rowFooterHeightForTableRow: Int) -> CGFloat
 }
 
@@ -52,7 +55,18 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
         didSet {
             invalidateLayoutIfChanged(frozenColumnHeaders, fromOldValue: oldValue) {
                 let context = TableLayoutInvaldationContext()
-                context.invalidColumnHeaderFreezeState = true
+                context.invalidateColumnHeaderFreezeState = true
+                return context
+            }
+        }
+    }
+    /// Setting too many columns here will eventaully cause only these columns to show when scrolling!
+    @IBInspectable public var frozenTableColumnIndexes = Set<Int>() {
+        // Even though this property won't show up in Interface Builder, keep it declared anyway @IBInspectable
+        didSet {
+            invalidateLayoutIfChanged(frozenTableColumnIndexes, fromOldValue: oldValue) {
+                let context = TableLayoutInvaldationContext()
+                context.invalidateFrozenColumns = true
                 return context
             }
         }
@@ -125,7 +139,7 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
         
         let context = context as! TableLayoutInvaldationContext
         
-        columnHeaderYNeedsUpdate = context.invalidColumnHeaderFreezeState
+        columnHeaderYNeedsUpdate = context.invalidateColumnHeaderFreezeState
         rowSupplementaryViewXNeedsUpdate = context.invalidateRowSupplementaryViews
         
         if context.invalidateEverything || context.invalidateDataSourceCounts {
@@ -143,7 +157,7 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
         
         println("Everything: \(context.invalidateEverything)")
         println("Row header/footer: \(context.invalidateRowSupplementaryViews)")
-        println("Colunn freezing: \(context.invalidColumnHeaderFreezeState)")
+        println("Colunn freezing: \(context.invalidateColumnHeaderFreezeState)")
     }
     
     public override func invalidationContextForBoundsChange(newBounds: CGRect) -> UICollectionViewLayoutInvalidationContext {
@@ -158,7 +172,7 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
         if frozenColumnHeaders {
             if newBounds.origin.y != collectionView?.bounds.origin.y {
                 // Need to move the column headers if we're frozen
-                context.invalidColumnHeaderFreezeState = true
+                context.invalidateColumnHeaderFreezeState = true
             }
         }
         
@@ -170,7 +184,7 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
             
             // Check if we need to update the Y position of the column headers to keep them pinned to the top when scroll view is pull down too far
             if newInsetBounds.minY < 0 {
-                context.invalidColumnHeaderFreezeState = true
+                context.invalidateColumnHeaderFreezeState = true
             }
 
             // Check if we need to update the X position of the row headers to keep them pinned to the left or right when scrolling too far
@@ -222,12 +236,12 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
         let columnHeaderX = collectionView.contentInset.left
         let columnHeaderY = calculateColumnHeaderY()
         
-        println("Y:                     \(bounds.minY)")
-        println("columnHeaderY:         \(columnHeaderY)")
-        println("minX:                  \(bounds.minX)")
-        println("maxX:                  \(bounds.maxX)")
-        println("rowSupplementaryViewX: \(rowSupplementaryViewX)")
-        println("columnHeaderX:         \(columnHeaderX)")
+//        println("Y:                     \(bounds.minY)")
+//        println("columnHeaderY:         \(columnHeaderY)")
+//        println("minX:                  \(bounds.minX)")
+//        println("maxX:                  \(bounds.maxX)")
+//        println("rowSupplementaryViewX: \(rowSupplementaryViewX)")
+//        println("columnHeaderX:         \(columnHeaderX)")
         if everythingNeedsUpdate {
             
             /// Only adds attributes if `columnHeaderHeight` is greater than 0.
@@ -269,38 +283,66 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
                 rowYOffsets[numberOfRows] = y
                 rowFooterYOffsets[numberOfRows] = y
                 
+                func resolveHeight(propertyValue: CGFloat, delegateValue: CGFloat?, zeroAllowed: Bool) -> CGFloat? {
+                    
+                    func isValueAllowed(value: CGFloat) -> Bool {
+                        return !zeroAllowed || value > 0
+                    }
+                    
+                    if let delegateValue = delegateValue where isValueAllowed(delegateValue) {
+                        return delegateValue
+                    } else if isValueAllowed(propertyValue) {
+                        return propertyValue
+                    } else {
+                        return nil
+                    }
+                }
+                
                 for row in 0..<numberOfRows {
-                    let headerHeight = delegate.collectionView?(collectionView, layout: self, rowHeaderHeightForTableRow: row) ?? rowHeaderHeight
-                    rowHeaderAttributes[row] = updateRowSupplementaryAttributes(newLayoutAttributesForSupplementaryRowHeaderView(row), withYOffset: y, height: headerHeight)
                     rowHeaderYOffsets[row] = y
-                    y += headerHeight
+                    if let headerHeight = resolveHeight(rowHeaderHeight, delegate.collectionView?(collectionView, layout: self, rowHeaderHeightForTableRow: row), true) {
+                        rowHeaderAttributes[row] = updateRowSupplementaryAttributes(newLayoutAttributesForSupplementaryRowHeaderView(row), withYOffset: y, height: headerHeight)
+                        y += headerHeight
+                    }
                     // Keep storing the last one
                     rowHeaderYOffsets[numberOfRows] = y
                     
-                    let height = delegate.collectionView?(collectionView, layout: self, rowHeightForTableRow: row) ?? rowHeight
+                    rowYOffsets[row] = y
+                    let height: CGFloat
+                    if let h = resolveHeight(rowHeight, delegate.collectionView?(collectionView, layout: self, rowHeightForTableRow: row), false) {
+                        height = h
+                    } else {
+                        println("Row \(row) has a height which is invalid, using a height of 80 instead")
+                        height = 80
+                    }
                     let intersects = visibleRect.intersects(CGRect(x: 0, y: y, width: 0, height: height))
                     if intersects {
                         if visibleRowLowerBounds == nil {
                             visibleRowLowerBounds = row
                             visibleRowUpperBounds = row + 1
-                        }
-                        
-                        if intersects {
+                        } else {
                             visibleRowUpperBounds = row
                         }
                     }
-                    
-                    rowYOffsets[row] = y
+                
                     y += height
                     // Keep storing the last one
                     rowYOffsets[numberOfRows] = y
                     
-                    let footerHeight = delegate.collectionView?(collectionView, layout: self, rowFooterHeightForTableRow: row) ?? rowFooterHeight
-                    rowFooterAttributes[row] = updateRowSupplementaryAttributes(newLayoutAttributesForSupplementaryRowFooterView(row), withYOffset: y, height: footerHeight)
                     rowFooterYOffsets[row] = y
-                    y += footerHeight
+                    if let footerHeight = resolveHeight(rowFooterHeight, delegate.collectionView?(collectionView, layout: self, rowFooterHeightForTableRow: row), true) {
+                        rowFooterAttributes[row] = updateRowSupplementaryAttributes(newLayoutAttributesForSupplementaryRowFooterView(row), withYOffset: y, height: footerHeight)
+                        y += footerHeight
+                    }
                     // Keep storing the last one
                     rowFooterYOffsets[numberOfRows] = y
+                }
+                
+                let rowRange: Range<Int>?
+                if let lower = visibleRowLowerBounds, upper = visibleRowUpperBounds {
+                    rowRange = lower...upper
+                } else {
+                    rowRange = nil
                 }
                 
                 /// :returns: `true` if x is in the visible range of the collection view
@@ -308,22 +350,19 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
                     return visibleRect.contains(CGPoint(x: x, y: visibleRect.midY))
                 }
                 
-                let rowRange: Range<Int>?
-                if let lower = visibleRowLowerBounds, upper = visibleRowUpperBounds {
-                    rowRange = lower..<upper
-                } else {
-                    rowRange = nil
-                }
-                
                 var x: CGFloat = columnHeaderX
                 for column in 0..<numberOfColumns {
-                    let width = delegate.collectionView(collectionView, layout: self, columnWidthForTableColumn: column)
+                    var width = delegate.collectionView(collectionView, layout: self, columnWidthForTableColumn: column)
+                    if width <= 0 {
+                        println("Column \(column) has a width which is invalid, using a width of 80 instead")
+                        width = 80
+                    }
                     
                     // Add column header attribute
                     addColumnHeader(column, x, width)
                     
                     if let rowRange = rowRange where isXInCollectionViewBounds(x) {
-                        // Pre calculate these items
+                        // Pre calculate these items as they're going to be visible
                         for row in rowRange {
                             if let minY = rowYOffsets[row], maxY = rowFooterYOffsets[row] {
                                 let indexPath = NSIndexPath(forTableColumn: column, inTableRow: row)
@@ -488,6 +527,7 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
         return attributes
     }
     
+    /// These are pre-calucated for the visible items in `prepareLayout` and then after that they are loaded as needed.
     public override func layoutAttributesForItemAtIndexPath(indexPath: NSIndexPath) -> UICollectionViewLayoutAttributes! {
         
         return loadLayoutAttributesForItem(indexPath)
@@ -617,23 +657,28 @@ private extension CollectionViewTableLayout {
 
 // MARK: - Custom invalidation context
 
-private class TableLayoutInvaldationContext: UICollectionViewLayoutInvalidationContext {
+class TableLayoutInvaldationContext: UICollectionViewLayoutInvalidationContext {
     
-    var invalidColumnHeaderFreezeState = false
+    var invalidateColumnHeaderFreezeState = false
+    var invalidateFrozenColumns = false
     var invalidateRowSupplementaryViews = false
 }
 
 // MARK: - Internal helper methods -
 
 private extension CollectionViewTableLayout {
- 
+    
     func invalidateLayoutIfChanged<T: Equatable>(newValue: T, fromOldValue oldValue: T, contextCreator: (() -> TableLayoutInvaldationContext)? = nil) {
         if oldValue != newValue {
-            if let context = contextCreator?() {
-                invalidateLayoutWithContext(context)
-            } else {
-                invalidateLayout()
-            }
+            invalidateWithContextCreator(contextCreator)
+        }
+    }
+    
+    func invalidateWithContextCreator(contextCreator: (() -> TableLayoutInvaldationContext)?) {
+        if let context = contextCreator?() {
+            invalidateLayoutWithContext(context)
+        } else {
+            invalidateLayout()
         }
     }
 }
