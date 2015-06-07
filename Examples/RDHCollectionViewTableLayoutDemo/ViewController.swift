@@ -36,7 +36,7 @@ private let RowFooterIdentifier = "RowFooterIdentifier"
 
 // MARK: - Collection view table layout data source
 
-extension ViewController: CollectionViewTableLayoutDataSource {
+extension ViewController: UICollectionViewDataSource {
     
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         // Must always be the number of columns

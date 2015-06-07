@@ -9,11 +9,6 @@
 import UIKit
 
 @objc
-public protocol CollectionViewTableLayoutDataSource: UICollectionViewDataSource {
-    
-}
-
-@objc
 public protocol CollectionViewTableLayoutDelegate: UICollectionViewDelegate {
     
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, columnWidthForTableColumn: Int) -> CGFloat
@@ -751,8 +746,8 @@ private extension CollectionViewTableLayout {
 // MARK: Layout delegate
 
 private extension CollectionViewTableLayout {
-    var dataSource: CollectionViewTableLayoutDataSource? {
-        return collectionView?.dataSource as? CollectionViewTableLayoutDataSource
+    var dataSource: UICollectionViewDataSource? {
+        return collectionView?.dataSource
     }
     
     var delegate: CollectionViewTableLayoutDelegate? {
