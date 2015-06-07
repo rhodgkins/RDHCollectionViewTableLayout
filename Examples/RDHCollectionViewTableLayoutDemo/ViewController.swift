@@ -19,6 +19,9 @@ final class ViewController: UIViewController {
         collectionView.contentInset = UIEdgeInsets(top: 100, left: 80, bottom: 60, right: 70)
         
         layout.firstFrozenTableColumns = 1
+//        layout.columnHeaderHeight = 0
+        layout.rowHeaderHeight = 20
+        layout.rowFooterHeight = 10
         
         collectionView.registerClass(ColumnHeader.self, forSupplementaryViewOfKind: CollectionViewTableLayout.ElementKindColumnHeader, withReuseIdentifier: ColumnHeaderIdentifier)
         collectionView.registerClass(RowHeader.self, forSupplementaryViewOfKind: CollectionViewTableLayout.ElementKindRowHeader, withReuseIdentifier: RowHeaderIdentifier)
@@ -41,7 +44,7 @@ extension ViewController: CollectionViewTableLayoutDataSource {
     }
     
     func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
-        return 5
+        return 10
     }
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
@@ -88,6 +91,14 @@ extension ViewController: CollectionViewTableLayoutDelegate {
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, rowHeightForTableRow: Int) -> CGFloat {
         return 200
     }
+    
+//    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, rowFooterHeightForTableRow: Int) -> CGFloat {
+//        return rowFooterHeightForTableRow % 2 == 0 ? 50 : 0
+//    }
+//    
+//    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, rowHeaderHeightForTableRow: Int) -> CGFloat {
+//        return rowHeaderHeightForTableRow % 2 == 0 ? 100 : 0
+//    }
 }
 
 // MARK: - Cell

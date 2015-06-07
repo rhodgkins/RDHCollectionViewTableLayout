@@ -40,12 +40,6 @@
                                         <userDefinedRuntimeAttribute type="number" keyPath="columnHeaderHeight">
                                             <real key="value" value="50"/>
                                         </userDefinedRuntimeAttribute>
-                                        <userDefinedRuntimeAttribute type="number" keyPath="rowHeaderHeight">
-                                            <real key="value" value="10"/>
-                                        </userDefinedRuntimeAttribute>
-                                        <userDefinedRuntimeAttribute type="number" keyPath="rowFooterHeight">
-                                            <real key="value" value="12"/>
-                                        </userDefinedRuntimeAttribute>
                                     </userDefinedRuntimeAttributes>
                                 </collectionViewLayout>
                                 <cells>
