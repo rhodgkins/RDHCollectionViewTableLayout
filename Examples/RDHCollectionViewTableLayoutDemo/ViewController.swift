@@ -16,6 +16,8 @@ final class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        layout.firstFrozenTableColumns = 1
+        
         collectionView.registerClass(ColumnHeader.self, forSupplementaryViewOfKind: CollectionViewTableLayout.ElementKindColumnHeader, withReuseIdentifier: ColumnHeaderIdentifier)
         collectionView.registerClass(RowHeader.self, forSupplementaryViewOfKind: CollectionViewTableLayout.ElementKindRowHeader, withReuseIdentifier: RowHeaderIdentifier)
         collectionView.registerClass(RowFooter.self, forSupplementaryViewOfKind: CollectionViewTableLayout.ElementKindRowFooter, withReuseIdentifier: RowFooterIdentifier)
@@ -33,7 +35,7 @@ extension ViewController: CollectionViewTableLayoutDataSource {
     
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         // Must always be the number of columns
-        return 4
+        return 5
     }
     
     func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
@@ -78,11 +80,11 @@ extension ViewController: CollectionViewTableLayoutDataSource {
 extension ViewController: CollectionViewTableLayoutDelegate {
     
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, columnWidthForTableColumn: Int) -> CGFloat {
-        return floor(collectionView.bounds.width / 3)
+        return 120
     }
     
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, rowHeightForTableRow: Int) -> CGFloat {
-        return floor(collectionView.bounds.height / 3)
+        return 200
     }
 }
 

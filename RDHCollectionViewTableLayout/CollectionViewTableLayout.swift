@@ -61,10 +61,9 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
         }
     }
     /// Setting too many columns here will eventaully cause only these columns to show when scrolling!
-    @IBInspectable public var frozenTableColumnIndexes = Set<Int>() {
-        // Even though this property won't show up in Interface Builder, keep it declared anyway @IBInspectable
+    @IBInspectable public var firstFrozenTableColumns = 0 {
         didSet {
-            invalidateLayoutIfChanged(frozenTableColumnIndexes, fromOldValue: oldValue) {
+            invalidateLayoutIfChanged(firstFrozenTableColumns, fromOldValue: oldValue) {
                 let context = TableLayoutInvaldationContext()
                 context.invalidateFrozenColumns = true
                 return context
@@ -155,6 +154,10 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
             }
         }
         
+        if context.invalidateFrozenColumns {
+            everythingNeedsUpdate = true
+        }
+        
         println("Everything: \(context.invalidateEverything)")
         println("Row header/footer: \(context.invalidateRowSupplementaryViews)")
         println("Colunn freezing: \(context.invalidateColumnHeaderFreezeState)")
@@ -167,6 +170,10 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
         if newBounds.origin.x != collectionView?.bounds.origin.x {
             // Need to update any headers and footers as these are full width
             context.invalidateRowSupplementaryViews = true
+            
+            if firstFrozenTableColumns > 0 {
+                context.invalidateFrozenColumns = true
+            }
         }
         
         if frozenColumnHeaders {
@@ -243,15 +250,6 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
 //        println("rowSupplementaryViewX: \(rowSupplementaryViewX)")
 //        println("columnHeaderX:         \(columnHeaderX)")
         if everythingNeedsUpdate {
-            
-            /// Only adds attributes if `columnHeaderHeight` is greater than 0.
-            func addColumnHeader(column: Int, x: CGFloat, width: CGFloat) {
-                if columnHeaderHeight > 0 {
-                    let attrs = newLayoutAttributesForSupplementaryColumnHeaderView(column)
-                    attrs.frame = CGRect(x: x, y: columnHeaderY, width: width, height: columnHeaderHeight)
-                    columnHeaderAttributes[column] = attrs
-                }
-            }
 
             /// :returns: the updated attributes if the height is greater than 0, `nil` otherwise
             func updateRowSupplementaryAttributes(attributes: UICollectionViewLayoutAttributes, withYOffset y: CGFloat, #height: CGFloat) -> UICollectionViewLayoutAttributes? {
@@ -268,6 +266,9 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
                 numberOfRows = dataSource.numberOfSectionsInCollectionView?(collectionView) ?? 0
                 numberOfColumns = dataSource.collectionView(collectionView, numberOfItemsInSection: 0)
                 
+                // If the data source doesn't provide supplementary views ignore teh heights of them
+                let supplementaryViewDataSourceMethod = dataSource.respondsToSelector("collectionView:viewForSupplementaryElementOfKind:atIndexPath:")
+                
                 // Visible collection view
                 var visibleRect = collectionView.bounds
                 visibleRect.origin = collectionView.contentOffset
@@ -276,7 +277,7 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
                 var visibleRowLowerBounds: Int?
                 var visibleRowUpperBounds: Int?
                 
-                var y = columnHeaderHeight
+                var y = supplementaryViewDataSourceMethod ? columnHeaderHeight : 0
                 
                 // Set initial values in case there are no rows
                 rowHeaderYOffsets[numberOfRows] = y
@@ -300,7 +301,7 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
                 
                 for row in 0..<numberOfRows {
                     rowHeaderYOffsets[row] = y
-                    if let headerHeight = resolveHeight(rowHeaderHeight, delegate.collectionView?(collectionView, layout: self, rowHeaderHeightForTableRow: row), true) {
+                    if let headerHeight = resolveHeight(rowHeaderHeight, delegate.collectionView?(collectionView, layout: self, rowHeaderHeightForTableRow: row), true) where supplementaryViewDataSourceMethod {
                         rowHeaderAttributes[row] = updateRowSupplementaryAttributes(newLayoutAttributesForSupplementaryRowHeaderView(row), withYOffset: y, height: headerHeight)
                         y += headerHeight
                     }
@@ -330,7 +331,7 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
                     rowYOffsets[numberOfRows] = y
                     
                     rowFooterYOffsets[row] = y
-                    if let footerHeight = resolveHeight(rowFooterHeight, delegate.collectionView?(collectionView, layout: self, rowFooterHeightForTableRow: row), true) {
+                    if let footerHeight = resolveHeight(rowFooterHeight, delegate.collectionView?(collectionView, layout: self, rowFooterHeightForTableRow: row), true) where supplementaryViewDataSourceMethod {
                         rowFooterAttributes[row] = updateRowSupplementaryAttributes(newLayoutAttributesForSupplementaryRowFooterView(row), withYOffset: y, height: footerHeight)
                         y += footerHeight
                     }
@@ -343,6 +344,18 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
                     rowRange = lower...upper
                 } else {
                     rowRange = nil
+                }
+                
+                /// Only adds attributes if `columnHeaderHeight` is greater than 0.
+                func addColumnHeader(column: Int, var x: CGFloat, width: CGFloat) {
+                    if columnHeaderHeight > 0 {
+                        if column < firstFrozenTableColumns {
+                            x += bounds.minX > 0 ? bounds.minX : 0
+                        }
+                        let attrs = newLayoutAttributesForSupplementaryColumnHeaderView(column)
+                        attrs.frame = CGRect(x: x, y: columnHeaderY, width: width, height: columnHeaderHeight)
+                        columnHeaderAttributes[column] = attrs
+                    }
                 }
                 
                 /// :returns: `true` if x is in the visible range of the collection view
@@ -365,9 +378,13 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
                         // Pre calculate these items as they're going to be visible
                         for row in rowRange {
                             if let minY = rowYOffsets[row], maxY = rowFooterYOffsets[row] {
+                                var colX = x
+                                if column < firstFrozenTableColumns {
+                                    colX += bounds.minX > 0 ? bounds.minX : 0
+                                }
                                 let indexPath = NSIndexPath(forTableColumn: column, inTableRow: row)
                                 let attrs = newLayoutAttributesForItem(indexPath)
-                                attrs.frame = CGRect(x: x, y: minY, width: width, height: maxY - minY)
+                                attrs.frame = CGRect(x: colX, y: minY, width: width, height: maxY - minY)
                                 itemAttributes[indexPath] = attrs
                             }
                         }
@@ -401,8 +418,11 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
         if columnHeaderYNeedsUpdate {
             for column in 0..<numberOfColumns {
                 let attr = columnHeaderAttributes[column]
-                if let x = columnXOffsets[column] {
-                    attr?.frame.origin.x = columnHeaderX + x
+                if var x = columnXOffsets[column] {
+                    if column < firstFrozenTableColumns {
+                        x += bounds.minX > 0 ? bounds.minX : 0
+                    }
+                    attr?.frame.origin.x = x
                 }
                 attr?.frame.origin.y = columnHeaderY
             }
@@ -561,10 +581,12 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
 
 private enum AttributeZIndex: Int {
     case ScrollBars = 0
-    case ColumnHeaders = -1
-    case RowHeaders = -2
-    case RowFooters = -3
-    case Items = -4
+    case FrozenColumnHeaders = -1
+    case ColumnHeaders = -2
+    case RowHeaders = -3
+    case RowFooters = -4
+    case FrozenItems = -5
+    case Items = -6
 }
 
 private struct SupplementaryViewIndexes {
@@ -585,8 +607,12 @@ private extension CollectionViewTableLayout {
             let column = indexPath.tableColumn
             let row = indexPath.tableRow
             // Bottom of cell is top of its footer
-            if let minX = columnXOffsets[column], maxX = columnXOffsets[column + 1], minY = rowYOffsets[row], maxY = rowFooterYOffsets[row] {
-                attribute.frame = CGRect(x: minX, y: minY, width: maxX - minX, height: maxY - minY)
+            if var minX = columnXOffsets[column], maxX = columnXOffsets[column + 1], minY = rowYOffsets[row], maxY = rowFooterYOffsets[row] {
+                let width = maxX - minX
+                if column < firstFrozenTableColumns {
+                    minX += collectionView!.bounds.minX
+                }
+                attribute.frame = CGRect(x: minX, y: minY, width: width, height: maxY - minY)
             }
             
             itemAttributes[indexPath] = attribute
@@ -599,7 +625,13 @@ private extension CollectionViewTableLayout {
         
         let attribute = newLayoutAttributesForItemAtIndexPath(indexPath)
         
-        attribute.zIndex = AttributeZIndex.Items.rawValue
+        let zIndex: AttributeZIndex
+        if indexPath.tableColumn < firstFrozenTableColumns {
+            zIndex = .FrozenItems
+        } else {
+            zIndex = .Items
+        }
+        attribute.zIndex = zIndex.rawValue
         
         return attribute
     }
@@ -609,7 +641,13 @@ private extension CollectionViewTableLayout {
         
         let attribute = newLayoutAttributesForSupplementaryViewOfKind(self.dynamicType.ElementKindColumnHeader, atIndexPath: NSIndexPath(forTableColumn: column, inTableRow: SupplementaryViewIndexes.ColumnHeader))
         
-        attribute.zIndex = AttributeZIndex.ColumnHeaders.rawValue
+        let zIndex: AttributeZIndex
+        if column < firstFrozenTableColumns {
+            zIndex = .FrozenColumnHeaders
+        } else {
+            zIndex = .ColumnHeaders
+        }
+        attribute.zIndex = zIndex.rawValue
         
         return attribute
     }
