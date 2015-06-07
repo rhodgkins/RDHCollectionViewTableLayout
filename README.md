@@ -22,7 +22,7 @@ To specify the number of rows in the table, return the desired value from `numbe
 To specify the number of columsn in the table, return your desired value from `collectionView:numberOfItemsInSection:`.
 You must ensure you return a constant value from this method and reload the collection view to reflect any changes.
 
-```
+```swift
 // Columns
 func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     // Must always be the same number unless you reload the collection view
