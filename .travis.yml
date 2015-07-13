@@ -1,5 +1,5 @@
 language: objective-c
-osx_image: xcode6.4
+osx_image: beta-xcode7.0
 xcode_project: Examples/RDHCollectionViewTableLayoutDemo.xcodeproj
 xcode_scheme: RDHCollectionViewTableLayoutDemo
 xcode_sdk: iphonesimulator
