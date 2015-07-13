@@ -104,10 +104,10 @@
 				44F288681B23088D00DD37A3 /* LICENSE */,
 				44F288691B23088D00DD37A3 /* RDHCollectionViewTableLayout.podspec */,
 				44F2886A1B23088D00DD37A3 /* README.md */,
+				44F609481B543F90000162DC /* RDHCollectionViewTableLayout */,
 				44F2886D1B23092600DD37A3 /* images */,
 				44F288441B2307FD00DD37A3 /* Demo */,
 				44F2885A1B2307FD00DD37A3 /* Tests */,
-				44F609481B543F90000162DC /* RDHCollectionViewTableLayout */,
 				44F288431B2307FD00DD37A3 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -290,9 +290,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				44F609461B543F90000162DC /* RDHCollectionViewTableLayout */,
 				44F288411B2307FD00DD37A3 /* RDHCollectionViewTableLayoutDemo */,
 				44F288561B2307FD00DD37A3 /* RDHCollectionViewTableLayoutDemoTests */,
-				44F609461B543F90000162DC /* RDHCollectionViewTableLayout */,
 			);
 		};
 /* End PBXProject section */
@@ -609,6 +609,7 @@
 				44F609611B543F90000162DC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
