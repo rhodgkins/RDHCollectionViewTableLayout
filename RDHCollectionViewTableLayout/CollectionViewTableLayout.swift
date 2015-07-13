@@ -458,8 +458,6 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
     }
     
     public override func collectionViewContentSize() -> CGSize {
-        var size = CGSize.zeroSize
-    
         // Look at the footer as thats below the rows
         if let lastXOffset = columnXOffsets[numberOfColumns], lastYOffset = rowFooterYOffsets[numberOfRows] {
             return CGSize(width: lastXOffset, height: lastYOffset)
@@ -529,13 +527,13 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
         }
         
         // Add items for all visible rows
-        if let collectionView = collectionView, visibleRows = visibleRows, visibleColumns = visibleColumns {
+        if let visibleRows = visibleRows, visibleColumns = visibleColumns where collectionView != nil {
             
 //            println("Currently visible rows: \(visibleRows)")
 //            println("Currently visible columns: \(visibleColumns)")
             
             // Add column headers if the rect maxY is less than the header height or its frozen
-            let columnsHeadersNeedAdding = frozenColumnHeaders || (rect.maxY <= columnHeaderHeight)
+            let _ = frozenColumnHeaders || (rect.maxY <= columnHeaderHeight)
             
             for col in visibleColumns {
                 if let attr = columnHeaderAttributes[col] {
@@ -568,11 +566,11 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
     }
     
     /// These are pre-calucated for the visible items in `prepareLayout` and then after that they are loaded as needed.
-    public override func layoutAttributesForItemAtIndexPath(indexPath: NSIndexPath) -> UICollectionViewLayoutAttributes! {
+    public override func layoutAttributesForItemAtIndexPath(indexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {
         return loadLayoutAttributesForItem(indexPath)
     }
     
-    public override func layoutAttributesForSupplementaryViewOfKind(elementKind: String, atIndexPath indexPath: NSIndexPath) -> UICollectionViewLayoutAttributes! {
+    public override func layoutAttributesForSupplementaryViewOfKind(elementKind: String, atIndexPath indexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {
         
         func resolveInfo() -> (key: Int, lookup: [Int : UICollectionViewLayoutAttributes]) {
             switch elementKind {
