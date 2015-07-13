@@ -5,6 +5,7 @@ RDHCollectionViewTableLayout
 [![Pod Platform](http://img.shields.io/cocoapods/p/RDHCollectionViewTableLayout.svg)](http://cocoadocs.org/docsets/RDHCollectionViewTableLayout/)
 [![Pod License](http://img.shields.io/cocoapods/l/RDHCollectionViewTableLayout.svg)](http://opensource.org/licenses/MIT)
 [![Reference Status](https://www.versioneye.com/objective-c/rdhcollectionviewtablelayout/reference_badge.svg)](https://www.versioneye.com/objective-c/rdhcollectionviewtablelayout/references)
+[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
 Works and tested on iOS 8.0 to 8.4 (under both Xcode 6.2, 6.3 and 6.4), but if you find any issues please [report](https://github.com/rhodgkins/RDHCollectionViewTableLayout/issues) them!
 
