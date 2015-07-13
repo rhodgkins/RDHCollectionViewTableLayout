@@ -7,7 +7,6 @@ Pod::Spec.new do |s|
     s.homepage = 'https://github.com/rhodgkins/RDHCollectionViewTableLayout'
     s.author = 'Rich Hodgkins'
     s.source = { :git => 'https://github.com/rhodgkins/RDHCollectionViewTableLayout.git', :tag => s.version.to_s }
-    s.docset_url = "http://cocoadocs.org/docsets/RDHCollectionViewTableLayout/xcode-docset.atom"
     s.social_media_url = 'https://twitter.com/rhodgkins'
 
     s.frameworks = 'Foundation', 'UIKit', 'CoreGraphics'
