@@ -8,7 +8,7 @@
 
 import UIKit
 import XCTest
-import RDHCollectionViewTableLayout
+@testable import RDHCollectionViewTableLayout
 
 class RDHCollectionViewTableLayoutDemoTests: XCTestCase {
     
@@ -23,7 +23,5 @@ class RDHCollectionViewTableLayoutDemoTests: XCTestCase {
     }
     
     func testExample() {
-        // This is an example of a functional test case.
-        XCTAssert(true, "Pass")
     }
 }
