@@ -13,7 +13,10 @@
 		44F2884F1B2307FD00DD37A3 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 44F2884E1B2307FD00DD37A3 /* Images.xcassets */; };
 		44F288521B2307FD00DD37A3 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 44F288501B2307FD00DD37A3 /* LaunchScreen.xib */; };
 		44F2885E1B2307FD00DD37A3 /* RDHTableLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44F2885D1B2307FD00DD37A3 /* RDHTableLayoutTests.swift */; };
-		44F2886F1B23093900DD37A3 /* CollectionViewTableLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44F2886E1B23093900DD37A3 /* CollectionViewTableLayout.swift */; };
+		44F6094C1B543F90000162DC /* RDHCollectionViewTableLayout.h in Headers */ = {isa = PBXBuildFile; fileRef = 44F6094B1B543F90000162DC /* RDHCollectionViewTableLayout.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		44F6095E1B543F90000162DC /* RDHCollectionViewTableLayout.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 44F609471B543F90000162DC /* RDHCollectionViewTableLayout.framework */; };
+		44F6095F1B543F90000162DC /* RDHCollectionViewTableLayout.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 44F609471B543F90000162DC /* RDHCollectionViewTableLayout.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		44F609681B543FB6000162DC /* CollectionViewTableLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44F609671B543FB6000162DC /* CollectionViewTableLayout.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -24,7 +27,28 @@
 			remoteGlobalIDString = 44F288411B2307FD00DD37A3;
 			remoteInfo = RDHCollectionViewTableLayoutDemo;
 		};
+		44F6095C1B543F90000162DC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 44F2883A1B2307FD00DD37A3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 44F609461B543F90000162DC;
+			remoteInfo = RDHCollectionViewTableLayout;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		44F609651B543F90000162DC /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				44F6095F1B543F90000162DC /* RDHCollectionViewTableLayout.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		44F288421B2307FD00DD37A3 /* RDHCollectionViewTableLayoutDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RDHCollectionViewTableLayoutDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -41,7 +65,10 @@
 		44F288691B23088D00DD37A3 /* RDHCollectionViewTableLayout.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; name = RDHCollectionViewTableLayout.podspec; path = ../RDHCollectionViewTableLayout.podspec; sourceTree = "<group>"; };
 		44F2886A1B23088D00DD37A3 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		44F2886C1B2308A800DD37A3 /* .travis.yml */ = {isa = PBXFileReference; lastKnownFileType = text; name = .travis.yml; path = ../.travis.yml; sourceTree = "<group>"; };
-		44F2886E1B23093900DD37A3 /* CollectionViewTableLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectionViewTableLayout.swift; sourceTree = "<group>"; };
+		44F609471B543F90000162DC /* RDHCollectionViewTableLayout.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RDHCollectionViewTableLayout.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		44F6094A1B543F90000162DC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		44F6094B1B543F90000162DC /* RDHCollectionViewTableLayout.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RDHCollectionViewTableLayout.h; sourceTree = "<group>"; };
+		44F609671B543FB6000162DC /* CollectionViewTableLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CollectionViewTableLayout.swift; path = ../../RDHCollectionViewTableLayout/CollectionViewTableLayout.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,10 +76,18 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				44F6095E1B543F90000162DC /* RDHCollectionViewTableLayout.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		44F288541B2307FD00DD37A3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		44F609431B543F90000162DC /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -70,9 +105,9 @@
 				44F288691B23088D00DD37A3 /* RDHCollectionViewTableLayout.podspec */,
 				44F2886A1B23088D00DD37A3 /* README.md */,
 				44F2886D1B23092600DD37A3 /* images */,
-				44F288671B23088200DD37A3 /* RDHCollectionViewTableLayout */,
 				44F288441B2307FD00DD37A3 /* Demo */,
 				44F2885A1B2307FD00DD37A3 /* Tests */,
+				44F609481B543F90000162DC /* RDHCollectionViewTableLayout */,
 				44F288431B2307FD00DD37A3 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -82,6 +117,7 @@
 			children = (
 				44F288421B2307FD00DD37A3 /* RDHCollectionViewTableLayoutDemo.app */,
 				44F288571B2307FD00DD37A3 /* RDHCollectionViewTableLayoutDemoTests.xctest */,
+				44F609471B543F90000162DC /* RDHCollectionViewTableLayout.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -125,15 +161,6 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		44F288671B23088200DD37A3 /* RDHCollectionViewTableLayout */ = {
-			isa = PBXGroup;
-			children = (
-				44F2886E1B23093900DD37A3 /* CollectionViewTableLayout.swift */,
-			);
-			name = RDHCollectionViewTableLayout;
-			path = ../RDHCollectionViewTableLayout;
-			sourceTree = "<group>";
-		};
 		44F2886D1B23092600DD37A3 /* images */ = {
 			isa = PBXGroup;
 			children = (
@@ -141,7 +168,36 @@
 			path = images;
 			sourceTree = "<group>";
 		};
+		44F609481B543F90000162DC /* RDHCollectionViewTableLayout */ = {
+			isa = PBXGroup;
+			children = (
+				44F6094B1B543F90000162DC /* RDHCollectionViewTableLayout.h */,
+				44F609671B543FB6000162DC /* CollectionViewTableLayout.swift */,
+				44F609491B543F90000162DC /* Supporting Files */,
+			);
+			path = RDHCollectionViewTableLayout;
+			sourceTree = "<group>";
+		};
+		44F609491B543F90000162DC /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				44F6094A1B543F90000162DC /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		44F609441B543F90000162DC /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				44F6094C1B543F90000162DC /* RDHCollectionViewTableLayout.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
 		44F288411B2307FD00DD37A3 /* RDHCollectionViewTableLayoutDemo */ = {
@@ -151,10 +207,12 @@
 				44F2883E1B2307FD00DD37A3 /* Sources */,
 				44F2883F1B2307FD00DD37A3 /* Frameworks */,
 				44F288401B2307FD00DD37A3 /* Resources */,
+				44F609651B543F90000162DC /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				44F6095D1B543F90000162DC /* PBXTargetDependency */,
 			);
 			name = RDHCollectionViewTableLayoutDemo;
 			productName = RDHCollectionViewTableLayoutDemo;
@@ -179,6 +237,24 @@
 			productReference = 44F288571B2307FD00DD37A3 /* RDHCollectionViewTableLayoutDemoTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		44F609461B543F90000162DC /* RDHCollectionViewTableLayout */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 44F609641B543F90000162DC /* Build configuration list for PBXNativeTarget "RDHCollectionViewTableLayout" */;
+			buildPhases = (
+				44F609421B543F90000162DC /* Sources */,
+				44F609431B543F90000162DC /* Frameworks */,
+				44F609441B543F90000162DC /* Headers */,
+				44F609451B543F90000162DC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = RDHCollectionViewTableLayout;
+			productName = RDHCollectionViewTableLayout;
+			productReference = 44F609471B543F90000162DC /* RDHCollectionViewTableLayout.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -195,6 +271,9 @@
 					44F288561B2307FD00DD37A3 = {
 						CreatedOnToolsVersion = 6.3.2;
 						TestTargetID = 44F288411B2307FD00DD37A3;
+					};
+					44F609461B543F90000162DC = {
+						CreatedOnToolsVersion = 6.4;
 					};
 				};
 			};
@@ -213,6 +292,7 @@
 			targets = (
 				44F288411B2307FD00DD37A3 /* RDHCollectionViewTableLayoutDemo */,
 				44F288561B2307FD00DD37A3 /* RDHCollectionViewTableLayoutDemoTests */,
+				44F609461B543F90000162DC /* RDHCollectionViewTableLayout */,
 			);
 		};
 /* End PBXProject section */
@@ -235,6 +315,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		44F609451B543F90000162DC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -244,7 +331,6 @@
 			files = (
 				44F2884A1B2307FD00DD37A3 /* ViewController.swift in Sources */,
 				44F288481B2307FD00DD37A3 /* AppDelegate.swift in Sources */,
-				44F2886F1B23093900DD37A3 /* CollectionViewTableLayout.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -256,6 +342,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		44F609421B543F90000162DC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				44F609681B543FB6000162DC /* CollectionViewTableLayout.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -263,6 +357,11 @@
 			isa = PBXTargetDependency;
 			target = 44F288411B2307FD00DD37A3 /* RDHCollectionViewTableLayoutDemo */;
 			targetProxy = 44F288581B2307FD00DD37A3 /* PBXContainerItemProxy */;
+		};
+		44F6095D1B543F90000162DC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 44F609461B543F90000162DC /* RDHCollectionViewTableLayout */;
+			targetProxy = 44F6095C1B543F90000162DC /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -426,6 +525,53 @@
 			};
 			name = Release;
 		};
+		44F609601B543F90000162DC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = RDHCollectionViewTableLayout/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		44F609611B543F90000162DC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = RDHCollectionViewTableLayout/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -455,6 +601,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		44F609641B543F90000162DC /* Build configuration list for PBXNativeTarget "RDHCollectionViewTableLayout" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				44F609601B543F90000162DC /* Debug */,
+				44F609611B543F90000162DC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};

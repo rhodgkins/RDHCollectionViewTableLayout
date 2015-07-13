@@ -34,6 +34,20 @@
                ReferencedContainer = "container:RDHCollectionViewTableLayoutDemo.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "44F609501B543F90000162DC"
+               BuildableName = "RDHCollectionViewTableLayoutTests.xctest"
+               BlueprintName = "RDHCollectionViewTableLayoutTests"
+               ReferencedContainer = "container:RDHCollectionViewTableLayoutDemo.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -49,6 +63,16 @@
                BlueprintIdentifier = "44F288561B2307FD00DD37A3"
                BuildableName = "RDHCollectionViewTableLayoutDemoTests.xctest"
                BlueprintName = "RDHCollectionViewTableLayoutDemoTests"
+               ReferencedContainer = "container:RDHCollectionViewTableLayoutDemo.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "44F609501B543F90000162DC"
+               BuildableName = "RDHCollectionViewTableLayoutTests.xctest"
+               BlueprintName = "RDHCollectionViewTableLayoutTests"
                ReferencedContainer = "container:RDHCollectionViewTableLayoutDemo.xcodeproj">
             </BuildableReference>
          </TestableReference>

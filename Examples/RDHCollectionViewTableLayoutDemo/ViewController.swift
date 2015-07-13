@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import RDHCollectionViewTableLayout
 
 final class ViewController: UIViewController {
 
