@@ -1,5 +1,4 @@
 language: objective-c
 osx_image: xcode7
-xcode_project: Examples/RDHCollectionViewTableLayoutDemo.xcodeproj
-xcode_scheme: RDHCollectionViewTableLayoutDemo
-xcode_sdk: iphonesimulator
+script:
+- xcodebuild -project Examples/RDHCollectionViewTableLayoutDemo.xcodeproj -scheme RDHCollectionViewTableLayoutDemo -destination "platform=iOS Simulator,name=iPhone 6" clean build test
