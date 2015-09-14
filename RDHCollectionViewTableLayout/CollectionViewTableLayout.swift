@@ -462,7 +462,7 @@ public class CollectionViewTableLayout: UICollectionViewLayout {
         if let lastXOffset = columnXOffsets[numberOfColumns], lastYOffset = rowFooterYOffsets[numberOfRows] {
             return CGSize(width: lastXOffset, height: lastYOffset)
         } else {
-            return CGSize.zeroSize
+            return CGSize.zero
         }
     }
     
